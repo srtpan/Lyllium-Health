@@ -1,0 +1,10 @@
+streamlit
+langchain
+langchain-anthropic
+langchain-community
+langchain-huggingface
+faiss-cpu
+sentence-transformers
+unstructured
+nltk
+#python3 -m venv venv # source venv/bin/activate
