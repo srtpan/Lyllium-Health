@@ -288,7 +288,8 @@ st.markdown("""
 
 
 # Get API key
-api_key = os.getenv("ANTHROPIC_API_KEY") 
+# api_key = os.getenv("ANTHROPIC_API_KEY") 
+api_key = st.secrets['API_KEY']
 
 if not api_key:
     st.error("Please set ANTHROPIC_API_KEY")
