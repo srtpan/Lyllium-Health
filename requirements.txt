@@ -2,7 +2,7 @@ streamlit
 langchain
 langchain-anthropic
 langchain-community
-langchain-huggingface
+# langchain-huggingface
 faiss-cpu
 sentence-transformers
 unstructured

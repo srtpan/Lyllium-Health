@@ -4,7 +4,7 @@ import time
 from langchain_anthropic import ChatAnthropic
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 import nltk
 nltk.download('punkt')
@@ -288,7 +288,7 @@ st.markdown("""
 
 
 # Get API key
-api_key = os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY")
+api_key = os.getenv("ANTHROPIC_API_KEY") 
 
 if not api_key:
     st.error("Please set ANTHROPIC_API_KEY")
@@ -346,7 +346,7 @@ if "messages" not in st.session_state:
 # Display welcome message if no messages
 if not st.session_state.messages:
     with st.chat_message("assistant"):
-        st.write("👋 Hi, I am Lylli, what would you like to chat about today?")
+        st.write("👋 Hi, I am Lyllium, what would you like to chat about today?")
 
 # Chat input
 if prompt := st.chat_input("Type your question..."):
@@ -358,32 +358,51 @@ if prompt := st.chat_input("Type your question..."):
     context = "\n".join([doc.page_content for doc in docs])
     
     # Create prompt with context - allowing external knowledge
-    full_prompt = f"""You are a friendly and helpful knowledge assistant. Answer naturally and conversationally. The user will ask a question about their lipid profile. Be kind with your answers, encourage them to make changes to their diet and lifestyle, and explain the importance of each lipid marker.
-    Use the following context to answer the question. If the context below is relevant, use it. Otherwise, just give a good answer based on your knowledge. Be gentle, talk like a friend. Keep your response concise, to the point but use extra words to explain calmly and friendly. Add listicles for explaining things. If using paragraphs, use smaller paragrphs. Highlight as needed. 
+    full_prompt = f"""You are Lyllium, a women's health assistant. You MUST follow these rules strictly:
 
-Context: {context}
+    **RULE 1: SCOPE CHECK**
+    First, determine if the question is about women's health (hormones, fertility, PCOS, menopause, periods, pregnancy, postpartum, breast health, reproductive health).
 
-Question: {prompt}
+    **RULE 2: IF NOT WOMEN'S HEALTH**
+    Respond ONLY with: "I specialize specifically in women's health topics like hormones, fertility, PCOS, menopause, and reproductive wellness. For other health questions, I'd recommend consulting with a healthcare provider or specialist. Is there anything about women's health I can help you with instead?"
 
-Answer: (Use the knowledge base context when relevant, but use American Heart Association guidelines when necessary and cite them)"""
+    **RULE 3: IF WOMEN'S HEALTH BUT NO CONTEXT**
+    If it's women's health but you don't have relevant information in the knowledge base, say a variation of "That's a great question! I don't have enough specific information about that in my current knowledge base. Please consult with a healthcare provider for accurate guidance on this topic."
+
+    **RULE 4: IF WOMEN'S HEALTH WITH CONTEXT**
+    Only then provide a helpful response using the knowledge base and general women's health knowledge.
+
+    **Knowledge base context:** {context}
+
+    **User's question:** {prompt}
+
+    Follow the rules above step by step but do not mention the rules in your response. Only answer facts available in your knowledge base, politely decline otherwise."""
+
+# Answer: (Use the knowledge base context when relevant, but use Menopause Society's guidelines when necessary and cite them)"""
     
     # Get response from Claude
     with st.chat_message("assistant"):
-        with st.spinner("Preparing the best response for you..."):
-            loading_placeholder = st.empty()
-            # loading_placeholder.write("Preparing the best response for you...")
+        # Show custom loading message
+        loading_placeholder = st.empty()
+        loading_placeholder.markdown("*Preparing the best response for you...*")
+        
+        response = llm.invoke(full_prompt)
+        
+        # Clear loading message and stream response
+        loading_placeholder.empty()
+        
+        # Use st.markdown directly for better formatting
+        full_response = ""
+        words = response.content.split()
+        st.markdown(response.content, unsafe_allow_html=True)
 
-            response = llm.invoke(full_prompt)
+        # st.write(words)
+        
+        # # for word in words:
+        # #     full_response += word + " "
+        # #     # Use st.markdown with container for proper formatting
+        # with st.container():
+        #     st.markdown(full_response, unsafe_allow_html=True)
+        #     time.sleep(0.03)
 
-            # Clear loading message and start streaming
-            loading_placeholder.empty()
-            placeholder = st.empty()
-            words = response.content.split()
-            displayed_text = ""
-
-            for word in words:
-                displayed_text += word + " "
-                placeholder.markdown(displayed_text, unsafe_allow_html=True)
-                time.sleep(0.05)
-            # st.write(response.content)
-            st.session_state.messages.append({"role": "assistant", "content": response.content})
+        # Auto-scroll to bottom after response
