@@ -7,4 +7,5 @@ faiss-cpu
 sentence-transformers
 unstructured
 nltk
+deepeval
 #python3 -m venv venv # source venv/bin/activate
