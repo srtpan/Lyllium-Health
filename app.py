@@ -37,8 +37,8 @@ st.markdown("""
 
 
 # Get API key
-anthropic_api_key = os.getenv("ANTHROPIC_API_KEY") 
-# anthropic_api_key = st.secrets['API_KEY']
+# anthropic_api_key = os.getenv("ANTHROPIC_API_KEY") 
+anthropic_api_key = st.secrets['API_KEY']
 
 if not anthropic_api_key:
     st.error("Please set ANTHROPIC_API_KEY")
@@ -135,7 +135,8 @@ if prompt := st.chat_input("Type your question..."):
         #1. To detect hallucinations - FaithfulnessMetric
 
         #use an OPENAI model -o3-mini 
-        openai_api_key = os.getenv("OPENAI_API_KEY") 
+        # openai_api_key = os.getenv("OPENAI_API_KEY") 
+        openai_api_key = st.secrets['API_KEY']
         test_case = LLMTestCase(
                     input=input,
                     context = [context],
