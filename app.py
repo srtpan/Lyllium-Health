@@ -136,7 +136,7 @@ if prompt := st.chat_input("Type your question..."):
 
         #use an OPENAI model -o3-mini 
         # openai_api_key = os.getenv("OPENAI_API_KEY") 
-        openai_api_key = st.secrets['API_KEY']
+        openai_api_key = st.secrets['OPENAI_API_KEY']
         test_case = LLMTestCase(
                     input=input,
                     context = [context],
